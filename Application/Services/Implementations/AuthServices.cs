@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Identity;
 using JqdIdentityApp.Domain.Entities;
+using JqdIdentityApp.Application.Services.Interfaces;
 
-namespace JqdIdentityApp.Application.Services
+namespace JqdIdentityApp.Application.Services.Implementations
 {
-    public class AuthService
+    public class AuthService : IAuthService
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;

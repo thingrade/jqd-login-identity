@@ -1,7 +1,4 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using JqdIdentityApp.Application.Services;
-using JqdIdentityApp.Domain.Entities;
 using JqdIdentityApp.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,17 +11,10 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-builder.Services.AddIdentity<User, IdentityRole>(options =>
-{
-    options.Password.RequireDigit = false;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase = false;
-    options.Password.RequiredLength = 6;
-})
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
-
-builder.Services.AddScoped<AuthService>();
+builder.Services
+    .AddJwtAuthentication(builder.Configuration)
+    .AddIdentityServices()
+    .AddAppServices();
 
 builder.Services.AddControllers();
 
