@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using JqdIdentityApp.Application.DTOs;
 using JqdIdentityApp.Application.Services;
+using JqdIdentityApp.Application.Services.Implementations;
+using JqdIdentityApp.Application.Services.Interfaces;
 
 namespace MyIdentityApp.Controllers
 {
@@ -8,11 +10,18 @@ namespace MyIdentityApp.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly AuthService _authService;
+        private readonly IAuthService _authService;
+        private readonly IUserService _userService;
+        private readonly ITokenService _tokenService;
 
-        public AuthController(AuthService authService)
+        public AuthController(
+            IAuthService authService,
+            IUserService userService,
+            ITokenService tokenService)
         {
             _authService = authService;
+            _userService = userService;
+            _tokenService = tokenService;
         }
 
         [HttpPost("register")]
@@ -34,7 +43,10 @@ namespace MyIdentityApp.Controllers
             if (!isValid)
                 return Unauthorized(new { message = "Invalid credentials" });
 
-            return Ok(new { message = "Login successful" });
+            var user = await _userService.GetUserByEmailAsync(request.Email);
+            var token = _tokenService.CreateToken(user!);
+
+            return Ok(new { token });
         }
     }
 }
